@@ -12,10 +12,14 @@ st.title('Peace of Mind Calculator')
 st.write("Adjust the inputs to see how your savings change.")
 
 # User inputs
-initial_age = st.number_input("Initial Age", min_value=18, max_value=80, value=38)
-retirement_age = st.number_input("Retirement Age", min_value=30, max_value=80, value=45)
-initial_investment = st.number_input("Initial Investment (€)", min_value=0, value=90000)
-goal_investment = st.number_input("Goal Investment (€)", min_value=0, value=735798)
+initial_age = st.number_input("Initial Age", min_value=18, max_value=80, value=38, 
+    key="initial_age", help="Your current age", kwargs={"type": "number"})
+retirement_age = st.number_input("Retirement Age", min_value=30, max_value=80, value=45,
+    key="retirement_age", help="Age you plan to retire", kwargs={"type": "number"})
+initial_investment = st.number_input("Initial Investment (€)", min_value=0, value=90000,
+    key="initial_investment", help="Current savings amount", kwargs={"type": "number"})
+goal_investment = st.number_input("Goal Investment (€)", min_value=0, value=735798,
+    key="goal_investment", help="Target savings amount", kwargs={"type": "number"})
 annual_return = st.slider("Annual Return (%)", min_value=5, max_value=100, value=12) / 100
 
 years_to_grow = retirement_age - initial_age
