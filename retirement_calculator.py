@@ -34,20 +34,42 @@ with st.expander("Advanced Settings"):
     col1, col2 = st.columns(2)
     with col1:
         inflation_rate = st.slider("Inflation Rate (%)", min_value=0, max_value=20, value=2) / 100
-        withdrawal_rate = st.slider("Safe Withdrawal Rate (%)", 
-            min_value=2.5, max_value=5.0, value=4.0, step=0.1,
-            help="Lower is more conservative, higher is more aggressive") / 100
+        
+        st.write("##### Withdrawal Rate")
+        use_custom_withdrawal = st.checkbox("Customize withdrawal rate", 
+            help="Default is 4% (Trinity study safe withdrawal rate)")
+        
+        if use_custom_withdrawal:
+            withdrawal_rate = st.slider("Annual Withdrawal Rate (%)", 
+                min_value=2.5, max_value=8.0, value=4.0, step=0.1,
+                help="Higher rates increase risk of depleting savings") / 100
+            
+            if withdrawal_rate > 0.04:
+                st.warning("⚠️ Rates above 4% significantly increase the risk of depleting savings during retirement")
+            elif withdrawal_rate < 0.035:
+                st.info("ℹ️ Conservative rate selected - requires more savings but provides extra safety")
+        else:
+            withdrawal_rate = 0.04  # Default 4% safe withdrawal rate
+            st.info("Using standard 4% safe withdrawal rate")
     
     with col2:
         has_partner = st.checkbox("Include Partner", value=False,
             help="Tax benefits for fiscal partners")
         include_aow = st.checkbox("Include AOW", value=True,
             help="Include Dutch state pension in calculations")
-        
-        if withdrawal_rate > 0.04:
-            st.warning("⚠️ Withdrawal rate above 4% increases the risk of depleting savings")
-        elif withdrawal_rate < 0.035:
-            st.info("ℹ️ Conservative withdrawal rate selected - requires more savings")
+    
+    st.markdown("""
+    #### About AOW (Dutch State Pension)
+    AOW is the Dutch state pension, a basic income provided by the government when you reach retirement age:
+    - Single person: €1,452.06/month
+    - With partner: €994.81/month per person
+    
+    **Important Notes:**
+    - You must have lived/worked in the Netherlands to be eligible
+    - Each year not in NL between ages 15-67 reduces AOW by 2%
+    - These amounts are based on 2024 rates and may change
+    - The retirement age is gradually increasing (currently 67 years)
+    """)
 
 # Calculate monthly AOW benefit
 monthly_aow = 0
