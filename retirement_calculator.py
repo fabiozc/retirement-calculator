@@ -42,6 +42,10 @@ def calculate_box3_tax(wealth, has_partner):
                   (taxable_wealth - bracket2_limit) * bracket3_rate)
     return tax
 
+# Define AOW constants (2024 rates)
+aow_single = 1452.06  # Monthly AOW for singles
+aow_partner = 994.81   # Monthly AOW per person for couples
+
 st.title('Retirement (aka "Peace of Mind") Calculator')
 
 # Create two main columns for the entire app
@@ -187,7 +191,3 @@ with right_col:
     monthly_savings = calculate_monthly_savings(goal_investment, initial_investment, real_return, years_to_grow)
     st.write("#### Required Monthly Savings")
     st.write(f"To reach your goal: €{monthly_savings:,.2f}/month")
-
-# Define AOW amounts first
-aow_single = 1452.06  # Monthly AOW for singles
-aow_partner = 994.81   # Monthly AOW per person for couples
