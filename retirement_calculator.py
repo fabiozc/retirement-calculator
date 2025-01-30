@@ -21,7 +21,7 @@ initial_investment = st.number_input("Initial Investment (€)", min_value=0, va
 goal_investment = st.number_input("Goal Investment (€)", min_value=0, value=735798,
     key="goal_investment", help="Target savings amount", kwargs={"inputmode": "numeric"})
 annual_return = st.slider("Annual Return (%)", min_value=5, max_value=100, value=12) / 100
-inflation_rate = st.slider("Inflation Rate (%)", min_value=0, max_value=10, value=3) / 100
+inflation_rate = st.slider("Inflation Rate (%)", min_value=0, max_value=20, value=3) / 100
 
 # Calculate real rate of return (accounts for inflation)
 real_return = (1 + annual_return) / (1 + inflation_rate) - 1
