@@ -69,6 +69,9 @@ with st.expander("Advanced Settings"):
             Amounts shown are 2024 rates. Retirement age is currently 67 years.
             """)
 
+# Calculate real return rate (after inflation)
+real_return = (1 + annual_return) / (1 + inflation_rate) - 1
+
 # Calculate monthly AOW benefit
 monthly_aow = 0
 if include_aow:
