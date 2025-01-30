@@ -8,7 +8,7 @@ def calculate_monthly_savings(goal, current, annual_rate, years):
     needed_per_month = (goal - current * future_value_factor) * (monthly_rate / (future_value_factor - 1))
     return max(0, needed_per_month)
 
-st.title("Retirement (aka "Peace of Mind") Calculator")
+st.title('Retirement (aka "Peace of Mind") Calculator')
 st.write("Adjust the inputs to see how your savings change.")
 
 # User inputs
