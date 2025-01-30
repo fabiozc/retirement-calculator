@@ -24,6 +24,10 @@ monthly_income_goal = st.number_input("Monthly After-Tax Income Goal (€)",
 initial_investment = st.number_input("Initial Investment (€)", min_value=0, value=90000,
     key="initial_investment", help="Current savings amount", kwargs={"inputmode": "numeric"})
 
+# Define AOW amounts first
+aow_single = 1452.06  # Monthly AOW for singles
+aow_partner = 994.81   # Monthly AOW per person for couples
+
 # Advanced settings in expander
 with st.expander("Advanced Settings"):
     col1, col2 = st.columns(2)
@@ -45,7 +49,56 @@ with st.expander("Advanced Settings"):
         elif withdrawal_rate < 0.035:
             st.info("ℹ️ Conservative withdrawal rate selected - requires more savings")
 
-# Calculations and results
+# Calculate monthly AOW benefit
+monthly_aow = 0
+if include_aow:
+    if has_partner:
+        monthly_aow = aow_partner * 2
+    else:
+        monthly_aow = aow_single
+
+# Calculate real return rate
+real_return = (1 + annual_return) / (1 + inflation_rate) - 1
+
+# Calculate required capital
+annual_income_needed = (monthly_income_goal - monthly_aow) * 12
+base_required_capital = annual_income_needed / withdrawal_rate
+
+# Calculate Box 3 tax
+def calculate_box3_tax(wealth, has_partner):
+    tax_free_amount = 57000 * (2 if has_partner else 1)
+    taxable_wealth = max(0, wealth - tax_free_amount)
+    
+    bracket1_rate = 0.0136
+    bracket2_rate = 0.0451
+    bracket3_rate = 0.0551
+    
+    bracket1_limit = 100000 * (2 if has_partner else 1)
+    bracket2_limit = 1000000 * (2 if has_partner else 1)
+    
+    tax = 0
+    if taxable_wealth > 0:
+        if taxable_wealth <= bracket1_limit:
+            tax = taxable_wealth * bracket1_rate
+        elif taxable_wealth <= bracket2_limit:
+            tax = (bracket1_limit * bracket1_rate +
+                  (taxable_wealth - bracket1_limit) * bracket2_rate)
+        else:
+            tax = (bracket1_limit * bracket1_rate +
+                  (bracket2_limit - bracket1_limit) * bracket2_rate +
+                  (taxable_wealth - bracket2_limit) * bracket3_rate)
+    return tax
+
+# Iterate to find required capital including tax
+required_capital = base_required_capital
+for _ in range(5):
+    annual_tax = calculate_box3_tax(required_capital, has_partner)
+    required_capital = (annual_income_needed + annual_tax) / withdrawal_rate
+
+# Set goal investment for monthly savings calculation
+goal_investment = required_capital
+
+# Display results
 st.write("### Retirement Analysis")
 col1, col2 = st.columns(2)
 
@@ -62,72 +115,10 @@ with col2:
     st.write(f"Tax Buffer: €{(required_capital - base_required_capital):,.2f}")
     st.write(f"Total Required: €{required_capital:,.2f}")
 
-# Monthly savings requirement
+# Calculate and display monthly savings requirement
 years_to_grow = retirement_age - initial_age
 monthly_savings = calculate_monthly_savings(goal_investment, initial_investment, real_return, years_to_grow)
 
 st.write("### Summary")
 st.write(f"Monthly Savings Required: €{monthly_savings:,.2f}")
 st.write(f"Annual Box 3 Tax at Goal: €{annual_tax:,.2f}")
-
-# Dutch AOW amounts (2024)
-aow_single = 1452.06  # Monthly AOW for singles
-aow_partner = 994.81   # Monthly AOW per person for couples
-
-# Box 3 tax brackets (2024)
-def calculate_box3_tax(wealth, has_partner):
-    tax_free_amount = 57000 * (2 if has_partner else 1)
-    taxable_wealth = max(0, wealth - tax_free_amount)
-    
-    # 2024 Box 3 brackets and rates
-    bracket1_rate = 0.0136  # Up to €100k
-    bracket2_rate = 0.0451  # €100k to €1M
-    bracket3_rate = 0.0551  # Above €1M
-    
-    bracket1_limit = 100000
-    bracket2_limit = 1000000
-    
-    if has_partner:
-        bracket1_limit *= 2
-        bracket2_limit *= 2
-    
-    tax = 0
-    if taxable_wealth > 0:
-        if taxable_wealth <= bracket1_limit:
-            tax = taxable_wealth * bracket1_rate
-        elif taxable_wealth <= bracket2_limit:
-            tax = (bracket1_limit * bracket1_rate +
-                  (taxable_wealth - bracket1_limit) * bracket2_rate)
-        else:
-            tax = (bracket1_limit * bracket1_rate +
-                  (bracket2_limit - bracket1_limit) * bracket2_rate +
-                  (taxable_wealth - bracket2_limit) * bracket3_rate)
-    
-    return tax
-
-# Calculate monthly AOW benefit
-monthly_aow = 0
-if include_aow:
-    if has_partner:
-        monthly_aow = aow_partner * 2
-    else:
-        monthly_aow = aow_single
-
-# Calculate required capital
-annual_income_needed = (monthly_income_goal - monthly_aow) * 12
-base_required_capital = annual_income_needed / withdrawal_rate
-
-# Iterate to find the correct capital needed including tax
-required_capital = base_required_capital
-for _ in range(5):  # Few iterations for convergence
-    annual_tax = calculate_box3_tax(required_capital, has_partner)
-    required_capital = (annual_income_needed + annual_tax) / withdrawal_rate
-
-# Calculate real rate of return (accounts for inflation)
-real_return = (1 + annual_return) / (1 + inflation_rate) - 1
-
-# Update goal investment for the rest of calculations
-goal_investment = required_capital
-
-# Annual tax impact
-annual_tax = calculate_box3_tax(required_capital, has_partner)
