@@ -78,20 +78,29 @@ with left_col:
         
         st.write("##### Withdrawal Rate")
         use_custom_withdrawal = st.checkbox("Customize withdrawal rate", 
-            help="Default is 4% (Trinity study safe withdrawal rate)")
+            help="Default matches inflation to preserve capital")
         
         if use_custom_withdrawal:
             withdrawal_rate = st.slider("Annual Withdrawal Rate (%)", 
-                min_value=2.5, max_value=8.0, value=4.0, step=0.1,
+                min_value=2.0, max_value=8.0, value=inflation_rate*100, step=0.1,
                 help="Higher rates increase risk of depleting savings") / 100
             
             if withdrawal_rate > 0.04:
                 st.warning("⚠️ Rates above 4% significantly increase the risk of depleting savings during retirement")
-            elif withdrawal_rate < 0.035:
-                st.info("ℹ️ Conservative rate selected - requires more savings but provides extra safety")
+            elif withdrawal_rate < inflation_rate:
+                st.info("ℹ️ Rate below inflation - your capital will grow in real terms")
+            elif withdrawal_rate == inflation_rate:
+                st.success("✓ Rate matches inflation - this preserves your capital's purchasing power")
+            
+            st.caption("""
+            Common withdrawal strategies:
+            - Capital preservation: Match inflation rate (safest)
+            - 4% Rule: Traditional retirement rule (moderate risk)
+            - Higher rates: Gradually spend down capital (higher risk)
+            """)
         else:
-            withdrawal_rate = 0.04  # Default 4% safe withdrawal rate
-            st.info("Using standard 4% safe withdrawal rate")
+            withdrawal_rate = inflation_rate  # Default to matching inflation
+            st.success(f"Using {withdrawal_rate*100:.1f}% withdrawal rate (matching inflation) to preserve capital value")
         
         has_partner = st.checkbox("Include Partner", value=False,
             help="Tax benefits for fiscal partners")
@@ -155,12 +164,15 @@ with right_col:
         Base Capital calculation:
         - Monthly income goal: €{monthly_income_goal:,.2f}
         - Annual income needed: €{annual_income_needed_from_savings:,.2f}
-        - Withdrawal rate: {withdrawal_rate*100:.1f}%
+        - Withdrawal rate: {withdrawal_rate*100:.1f}% ({
+            "matches inflation - preserves capital" if withdrawal_rate == inflation_rate 
+            else "custom rate - see notes on capital impact"})
         - Formula: Annual income ÷ Withdrawal rate
         - €{annual_income_needed_from_savings:,.2f} ÷ {withdrawal_rate:.3f} = €{base_required_capital:,.2f}
         
         This is the amount needed to generate your target income using 
-        the {withdrawal_rate*100:.1f}% withdrawal rate, before considering taxes.
+        the selected withdrawal rate. A rate matching inflation ({inflation_rate*100:.1f}%) 
+        helps preserve your capital's purchasing power over time.
         """)
     st.write(f"Annual Box 3 Tax: €{annual_tax:,.2f}")
     st.write(f"Tax Buffer: €{tax_buffer:,.2f}")
