@@ -21,12 +21,18 @@ initial_investment = st.number_input("Initial Investment (€)", min_value=0, va
 goal_investment = st.number_input("Goal Investment (€)", min_value=0, value=735798,
     key="goal_investment", help="Target savings amount", kwargs={"inputmode": "numeric"})
 annual_return = st.slider("Annual Return (%)", min_value=5, max_value=100, value=12) / 100
+inflation_rate = st.slider("Inflation Rate (%)", min_value=0, max_value=10, value=3) / 100
+
+# Calculate real rate of return (accounts for inflation)
+real_return = (1 + annual_return) / (1 + inflation_rate) - 1
 
 years_to_grow = retirement_age - initial_age
 
-# Calculation
-monthly_savings = calculate_monthly_savings(goal_investment, initial_investment, annual_return, years_to_grow)
+# Adjust goal for inflation
+inflation_adjusted_goal = goal_investment * (1 + inflation_rate) ** years_to_grow
 
-st.write(f"### Goal: €{goal_investment:,.2f} by the age of {retirement_age}!")
+# Calculation using real return rate and inflation-adjusted goal
+monthly_savings = calculate_monthly_savings(inflation_adjusted_goal, initial_investment, real_return, years_to_grow)
 
+st.write(f"### Inflation-Adjusted Goal: €{inflation_adjusted_goal:,.2f} by the age of {retirement_age}!")
 st.write(f"### Monthly Savings Required: €{monthly_savings:,.2f}")
