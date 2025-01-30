@@ -67,6 +67,14 @@ with left_col:
     retirement_age = st.number_input("Retirement Age", min_value=30, max_value=80, value=45,
         key="retirement_age", help="Age you plan to retire", kwargs={"inputmode": "numeric"})
     
+    # Validate ages
+    if retirement_age <= initial_age:
+        st.error("⚠️ Retirement age must be greater than your current age")
+        st.stop()  # Stop execution if ages are invalid
+    
+    years_to_retirement = retirement_age - initial_age
+    st.caption(f"Time to retirement: {years_to_retirement} years")
+    
     st.write("##### Target Retirement Income")
     monthly_income_goal = st.number_input("Monthly After-Tax Income at Retirement (€)", 
         min_value=0, value=5000, key="monthly_income", 
