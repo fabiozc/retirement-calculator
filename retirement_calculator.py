@@ -77,12 +77,13 @@ if include_aow:
     else:
         monthly_aow = aow_single
 
-# Calculate real return rate
-real_return = (1 + annual_return) / (1 + inflation_rate) - 1
-
 # Calculate required capital
-annual_income_needed = (monthly_income_goal - monthly_aow) * 12
-base_required_capital = annual_income_needed / withdrawal_rate
+annual_spending = monthly_income_goal * 12  # Total annual spending needed
+annual_aow = monthly_aow * 12  # Annual AOW income if included
+annual_income_needed_from_savings = annual_spending - annual_aow  # Net amount needed from savings
+
+# Base capital calculation using withdrawal rate
+base_required_capital = annual_income_needed_from_savings / withdrawal_rate
 
 # Calculate Box 3 tax
 def calculate_box3_tax(wealth, has_partner):
@@ -113,7 +114,7 @@ def calculate_box3_tax(wealth, has_partner):
 required_capital = base_required_capital
 for _ in range(5):
     annual_tax = calculate_box3_tax(required_capital, has_partner)
-    required_capital = (annual_income_needed + annual_tax) / withdrawal_rate
+    required_capital = annual_income_needed_from_savings / withdrawal_rate + (annual_tax / withdrawal_rate)
 
 # Set goal investment for monthly savings calculation
 goal_investment = required_capital
