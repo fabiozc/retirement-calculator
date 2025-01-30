@@ -3,7 +3,7 @@ import numpy as np
 
 # Set wide layout mode
 st.set_page_config(
-    page_title='Netherlands Peace of Mind Retirement',
+    page_title='Netherlands Financial Freedom Calculator',
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -53,39 +53,46 @@ def calculate_box3_tax(wealth, has_partner):
 aow_single = 1452.06  # Monthly AOW for singles
 aow_partner = 994.81   # Monthly AOW per person for couples
 
-st.title('Netherlands "Peace of Mind" Retirement')
-st.caption("Calculate your path to financial independence in the Netherlands 🇳🇱")
+st.title('Netherlands Financial Freedom Calculator')
+st.caption("""
+    Plan your path to financial independence in the Netherlands 🇳🇱 
+    Calculate how much capital you need to generate your desired income by your target age.
+""")
 
 # Create two main columns for the entire app
 left_col, right_col = st.columns([1, 1], gap="large")
 
 # Left column - Inputs
 with left_col:
-    st.write("### Basic Inputs")
-    initial_age = st.number_input("Initial Age", min_value=18, max_value=80, value=38, 
+    st.write("### Your Goals")
+    initial_age = st.number_input("Current Age", min_value=18, max_value=80, value=38, 
         key="initial_age", help="Your current age", kwargs={"inputmode": "numeric"})
-    retirement_age = st.number_input("Retirement Age", min_value=30, max_value=80, value=45,
-        key="retirement_age", help="Age you plan to retire", kwargs={"inputmode": "numeric"})
-    
-    # Validate ages
-    if retirement_age <= initial_age:
-        st.error("⚠️ Retirement age must be greater than your current age")
-        st.stop()  # Stop execution if ages are invalid
-    
-    years_to_retirement = retirement_age - initial_age
-    st.caption(f"Time to retirement: {years_to_retirement} years")
-    
-    st.write("##### Target Retirement Income")
-    monthly_income_goal = st.number_input("Monthly After-Tax Income at Retirement (€)", 
-        min_value=0, value=5000, key="monthly_income", 
-        help="How much monthly income you want AFTER you retire (not needed now)", 
+    target_age = st.number_input("Target Freedom Age", min_value=30, max_value=80, value=45,
+        key="retirement_age", help="Age when you want to achieve financial freedom", 
         kwargs={"inputmode": "numeric"})
     
-    st.info("💡 This is the income you want to have each month AFTER you retire, "
-            f"starting at age {retirement_age}. It's not the amount you need to save monthly now.")
+    # Validate ages
+    if target_age <= initial_age:
+        st.error("⚠️ Target age must be greater than your current age")
+        st.stop()
     
-    initial_investment = st.number_input("Current Savings (€)", min_value=0, value=90000,
-        key="initial_investment", help="How much you have saved already", kwargs={"inputmode": "numeric"})
+    years_to_freedom = target_age - initial_age
+    st.caption(f"Time to financial freedom: {years_to_freedom} years")
+    
+    st.write("##### Desired Monthly Income")
+    monthly_income_goal = st.number_input("Monthly After-Tax Income Goal (€)", 
+        min_value=0, value=5000, key="monthly_income", 
+        help="How much monthly income you want your investments to generate", 
+        kwargs={"inputmode": "numeric"})
+    
+    st.info("""
+        💡 This is the monthly income you want your investments to generate, 
+        giving you the freedom to work because you want to, not because you have to.
+    """)
+    
+    initial_investment = st.number_input("Current Investment Portfolio (€)", min_value=0, value=90000,
+        key="initial_investment", help="Your current investment portfolio value", 
+        kwargs={"inputmode": "numeric"})
     annual_return = st.slider("Annual Return (%)", min_value=5, max_value=100, value=12) / 100
 
     # Advanced settings in expander
@@ -148,7 +155,7 @@ with left_col:
 
 # Right column - Analysis
 with right_col:
-    st.write("### Retirement Analysis")
+    st.write("### Financial Freedom Analysis")
     
     # Calculate monthly AOW benefit
     monthly_aow = 0
@@ -179,8 +186,26 @@ with right_col:
     st.write("#### Monthly Income")
     st.write(f"Target Income: €{monthly_income_goal:,.2f}")
     if include_aow:
-        st.write(f"AOW Benefit: €{monthly_aow:,.2f}")
-        st.write(f"Required from Savings: €{(monthly_income_goal - monthly_aow):,.2f}")
+        st.write(f"Optional AOW Benefit: €{monthly_aow:,.2f}")
+        st.write(f"Required from Investments: €{(monthly_income_goal - monthly_aow):,.2f}")
+
+    st.write("#### Investment Portfolio Needs")
+    st.write(f"Base Portfolio: €{base_required_capital:,.2f}")
+    with st.expander("💡 Understanding these numbers"):
+        st.markdown(f"""
+        Portfolio calculation:
+        - Desired monthly income: €{monthly_income_goal:,.2f}
+        - Annual income needed: €{annual_income_needed_from_savings:,.2f}
+        - Sustainable withdrawal rate: {withdrawal_rate*100:.1f}% ({
+            "matches investment returns after inflation - preserves capital" if withdrawal_rate == break_even_rate 
+            else "custom rate - see notes on capital impact"})
+        - Formula: Annual income ÷ Withdrawal rate
+        - €{annual_income_needed_from_savings:,.2f} ÷ {withdrawal_rate:.3f} = €{base_required_capital:,.2f}
+        
+        This portfolio size should sustainably generate your target income using 
+        the selected withdrawal rate. A rate matching investment returns after inflation ({break_even_rate*100:.1f}%) 
+        helps preserve your capital's purchasing power over time.
+        """)
 
     st.write("#### Capital Needs")
     st.write(f"Base Capital: €{base_required_capital:,.2f}")
@@ -224,7 +249,11 @@ with right_col:
     st.write(f"After annual Box 3 tax of €{annual_tax:,.2f}, effective monthly income: €{(annual_withdrawal - annual_tax)/12:,.2f}")
 
     # Calculate and display monthly savings requirement
-    years_to_grow = retirement_age - initial_age
+    years_to_grow = target_age - initial_age
     monthly_savings = calculate_monthly_savings(goal_investment, initial_investment, real_return, years_to_grow)
-    st.write("#### Required Monthly Savings")
-    st.write(f"To reach your goal: €{monthly_savings:,.2f}/month")
+    st.write("#### Monthly Investment Needed")
+    st.write(f"To reach your freedom goal: €{monthly_savings:,.2f}/month")
+    st.caption("""
+        This is how much you need to invest monthly to build your portfolio, 
+        assuming consistent returns and regular investments.
+    """)
