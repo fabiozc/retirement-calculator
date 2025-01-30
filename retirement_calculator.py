@@ -113,16 +113,16 @@ def calculate_box3_tax(wealth, has_partner):
                   (taxable_wealth - bracket2_limit) * bracket3_rate)
     return tax
 
-# Iterate to find required capital including tax
+# Calculate final required capital including tax buffer
 required_capital = base_required_capital
-for _ in range(5):
-    annual_tax = calculate_box3_tax(required_capital, has_partner)
-    required_capital = annual_income_needed_from_savings / withdrawal_rate + (annual_tax / withdrawal_rate)
+annual_tax = calculate_box3_tax(required_capital, has_partner)
+tax_buffer = annual_tax / withdrawal_rate
+required_capital = base_required_capital + tax_buffer
 
 # Set goal investment for monthly savings calculation
 goal_investment = required_capital
 
-# Display results
+# Display results with more detailed breakdown
 st.write("### Retirement Analysis")
 col1, col2 = st.columns(2)
 
@@ -136,8 +136,28 @@ with col1:
 with col2:
     st.write("#### Capital Requirements")
     st.write(f"Base Capital: €{base_required_capital:,.2f}")
-    st.write(f"Tax Buffer: €{(required_capital - base_required_capital):,.2f}")
+    st.write(f"Annual Box 3 Tax: €{annual_tax:,.2f}")
+    st.write(f"Tax Buffer: €{tax_buffer:,.2f}")
     st.write(f"Total Required: €{required_capital:,.2f}")
+    
+    with st.expander("💡 Understanding Tax Buffer"):
+        st.markdown("""
+        The tax buffer is additional capital needed to cover the Dutch Box 3 wealth tax:
+        
+        - Box 3 taxes your wealth above €57k (€114k for partners)
+        - We need extra capital to generate income to pay this tax
+        - Example: If Box 3 tax is €10k/year and withdrawal rate is 4%:
+          - Tax Buffer = €10k ÷ 4% = €250k extra capital needed
+        
+        This ensures your target monthly income remains intact after paying wealth tax.
+        """)
+
+# Example validation
+st.write("#### Validation")
+annual_withdrawal = required_capital * withdrawal_rate
+monthly_withdrawal = annual_withdrawal / 12
+st.write(f"This capital would provide €{monthly_withdrawal:,.2f}/month before tax")
+st.write(f"After annual Box 3 tax of €{annual_tax:,.2f}, effective monthly income: €{(annual_withdrawal - annual_tax)/12:,.2f}")
 
 # Calculate and display monthly savings requirement
 years_to_grow = retirement_age - initial_age
@@ -145,4 +165,3 @@ monthly_savings = calculate_monthly_savings(goal_investment, initial_investment,
 
 st.write("### Summary")
 st.write(f"Monthly Savings Required: €{monthly_savings:,.2f}")
-st.write(f"Annual Box 3 Tax at Goal: €{annual_tax:,.2f}")
