@@ -59,17 +59,15 @@ with st.expander("Advanced Settings"):
             help="Include Dutch state pension in calculations")
         
         if include_aow:
-            with st.expander("About AOW (Dutch State Pension)"):
-                st.markdown("""
-                <small>
-                AOW is the Dutch state pension, providing basic income at retirement age:
-                - Single person: €1,452.06/month
-                - With partner: €994.81/month per person
+            st.caption("ℹ️ About AOW (Dutch State Pension)")
+            st.caption("""
+            AOW is the Dutch state pension, providing basic income at retirement age:
+            • Single person: €1,452.06/month
+            • With partner: €994.81/month per person
 
-                **Note:** Requires NL residency/work history. Each year not in NL (ages 15-67) reduces AOW by 2%. 
-                Amounts shown are 2024 rates. Retirement age is currently 67 years.
-                </small>
-                """, unsafe_allow_html=True)
+            Note: Requires NL residency/work history. Each year not in NL (ages 15-67) reduces AOW by 2%. 
+            Amounts shown are 2024 rates. Retirement age is currently 67 years.
+            """)
 
 # Calculate monthly AOW benefit
 monthly_aow = 0
