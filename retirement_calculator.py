@@ -2,6 +2,8 @@ import streamlit as st
 import numpy as np
 
 def calculate_monthly_savings(goal, current, annual_rate, years):
+    if annual_rate <= -1:  # Handle extreme negative real returns
+        return (goal - current) / (years * 12)
     months = years * 12
     monthly_rate = (1 + annual_rate) ** (1/12) - 1  # Convert annual return to monthly
     future_value_factor = (1 + monthly_rate) ** months
