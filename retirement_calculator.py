@@ -55,21 +55,21 @@ with st.expander("Advanced Settings"):
     with col2:
         has_partner = st.checkbox("Include Partner", value=False,
             help="Tax benefits for fiscal partners")
-        include_aow = st.checkbox("Include AOW", value=True,
+        include_aow = st.checkbox("Include AOW", value=False,
             help="Include Dutch state pension in calculations")
-    
-    st.markdown("""
-    #### About AOW (Dutch State Pension)
-    AOW is the Dutch state pension, a basic income provided by the government when you reach retirement age:
-    - Single person: €1,452.06/month
-    - With partner: €994.81/month per person
-    
-    **Important Notes:**
-    - You must have lived/worked in the Netherlands to be eligible
-    - Each year not in NL between ages 15-67 reduces AOW by 2%
-    - These amounts are based on 2024 rates and may change
-    - The retirement age is gradually increasing (currently 67 years)
-    """)
+        
+        if include_aow:
+            with st.expander("About AOW (Dutch State Pension)"):
+                st.markdown("""
+                <small>
+                AOW is the Dutch state pension, providing basic income at retirement age:
+                - Single person: €1,452.06/month
+                - With partner: €994.81/month per person
+
+                **Note:** Requires NL residency/work history. Each year not in NL (ages 15-67) reduces AOW by 2%. 
+                Amounts shown are 2024 rates. Retirement age is currently 67 years.
+                </small>
+                """, unsafe_allow_html=True)
 
 # Calculate monthly AOW benefit
 monthly_aow = 0
