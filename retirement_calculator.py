@@ -46,7 +46,8 @@ def calculate_box3_tax(wealth, has_partner):
 aow_single = 1452.06  # Monthly AOW for singles
 aow_partner = 994.81   # Monthly AOW per person for couples
 
-st.title('Retirement (aka "Peace of Mind") Calculator')
+st.title('Netherlands "Peace of Mind" Retirement')
+st.caption("Calculate your path to financial independence in the Netherlands 🇳🇱")
 
 # Create two main columns for the entire app
 left_col, right_col = st.columns([1, 1], gap="large")
