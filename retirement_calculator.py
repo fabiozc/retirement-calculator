@@ -23,6 +23,7 @@ monthly_income_goal = st.number_input("Monthly After-Tax Income Goal (€)",
     kwargs={"inputmode": "numeric"})
 initial_investment = st.number_input("Initial Investment (€)", min_value=0, value=90000,
     key="initial_investment", help="Current savings amount", kwargs={"inputmode": "numeric"})
+annual_return = st.slider("Annual Return (%)", min_value=5, max_value=100, value=12) / 100
 
 # Define AOW amounts first
 aow_single = 1452.06  # Monthly AOW for singles
@@ -32,7 +33,6 @@ aow_partner = 994.81   # Monthly AOW per person for couples
 with st.expander("Advanced Settings"):
     col1, col2 = st.columns(2)
     with col1:
-        annual_return = st.slider("Annual Return (%)", min_value=5, max_value=100, value=12) / 100
         inflation_rate = st.slider("Inflation Rate (%)", min_value=0, max_value=20, value=2) / 100
         withdrawal_rate = st.slider("Safe Withdrawal Rate (%)", 
             min_value=2.5, max_value=5.0, value=4.0, step=0.1,
