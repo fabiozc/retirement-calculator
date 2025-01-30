@@ -76,31 +76,43 @@ with left_col:
     with st.expander("Advanced Settings"):
         inflation_rate = st.slider("Inflation Rate (%)", min_value=0, max_value=20, value=2) / 100
         
+        # Calculate break-even withdrawal rate
+        real_return = (1 + annual_return) / (1 + inflation_rate) - 1
+        break_even_rate = real_return
+        
         st.write("##### Withdrawal Rate")
+        st.info(f"""
+        💡 Based on your inputs:
+        - Annual Return: {annual_return*100:.1f}%
+        - Inflation: {inflation_rate*100:.1f}%
+        - Break-even Rate: {break_even_rate*100:.1f}% (this preserves your capital in real terms)
+        """)
+        
         use_custom_withdrawal = st.checkbox("Customize withdrawal rate", 
-            help="Default matches inflation to preserve capital")
+            help="Default uses break-even rate to preserve capital")
         
         if use_custom_withdrawal:
             withdrawal_rate = st.slider("Annual Withdrawal Rate (%)", 
-                min_value=2.0, max_value=8.0, value=inflation_rate*100, step=0.1,
+                min_value=2.0, max_value=8.0, value=break_even_rate*100, step=0.1,
                 help="Higher rates increase risk of depleting savings") / 100
             
-            if withdrawal_rate > 0.04:
-                st.warning("⚠️ Rates above 4% significantly increase the risk of depleting savings during retirement")
-            elif withdrawal_rate < inflation_rate:
-                st.info("ℹ️ Rate below inflation - your capital will grow in real terms")
-            elif withdrawal_rate == inflation_rate:
-                st.success("✓ Rate matches inflation - this preserves your capital's purchasing power")
+            if withdrawal_rate > break_even_rate:
+                st.warning(f"⚠️ Rate above {break_even_rate*100:.1f}% will gradually deplete capital")
+            elif withdrawal_rate < break_even_rate:
+                st.info("ℹ️ Rate below break-even - your capital will grow in real terms")
+            else:
+                st.success("✓ Rate matches break-even - this preserves your capital's purchasing power")
             
             st.caption("""
             Common withdrawal strategies:
-            - Capital preservation: Match inflation rate (safest)
-            - 4% Rule: Traditional retirement rule (moderate risk)
-            - Higher rates: Gradually spend down capital (higher risk)
+            - Below break-even rate: Grow capital
+            - At break-even rate: Preserve capital (recommended)
+            - 4% Rule: Traditional retirement rule (may deplete capital)
+            - Above break-even: Gradually spend down capital
             """)
         else:
-            withdrawal_rate = inflation_rate  # Default to matching inflation
-            st.success(f"Using {withdrawal_rate*100:.1f}% withdrawal rate (matching inflation) to preserve capital value")
+            withdrawal_rate = break_even_rate  # Default to break-even rate
+            st.success(f"Using {withdrawal_rate*100:.1f}% withdrawal rate (break-even) to preserve capital value")
         
         has_partner = st.checkbox("Include Partner", value=False,
             help="Tax benefits for fiscal partners")
@@ -122,9 +134,6 @@ with left_col:
 with right_col:
     st.write("### Retirement Analysis")
     
-    # Calculate real return rate (after inflation)
-    real_return = (1 + annual_return) / (1 + inflation_rate) - 1
-
     # Calculate monthly AOW benefit
     monthly_aow = 0
     if include_aow:
