@@ -1,6 +1,13 @@
 import streamlit as st
 import numpy as np
 
+# Set wide layout mode
+st.set_page_config(
+    page_title='Netherlands Peace of Mind Retirement',
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
 def calculate_monthly_savings(goal, current, annual_rate, years):
     if annual_rate <= -1:  # Handle extreme negative real returns
         return (goal - current) / (years * 12)
