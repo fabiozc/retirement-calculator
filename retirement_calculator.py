@@ -90,15 +90,22 @@ base_required_capital = annual_income_needed_from_savings / withdrawal_rate
 
 # Calculate Box 3 tax
 def calculate_box3_tax(wealth, has_partner):
+    # Tax-free threshold
     tax_free_amount = 57000 * (2 if has_partner else 1)
     taxable_wealth = max(0, wealth - tax_free_amount)
     
-    bracket1_rate = 0.0136
-    bracket2_rate = 0.0451
-    bracket3_rate = 0.0551
+    # 2024 Box 3 brackets and rates
+    # Bracket 1: up to €100k (€200k for partners): 6.04% return taxed at 32% = 1.93%
+    # Bracket 2: €100k to €1M: 5.53% return taxed at 32% = 1.77%
+    # Bracket 3: above €1M: 5.80% return taxed at 32% = 1.86%
     
     bracket1_limit = 100000 * (2 if has_partner else 1)
     bracket2_limit = 1000000 * (2 if has_partner else 1)
+    
+    # Effective tax rates per bracket
+    bracket1_rate = 0.0193  # 6.04% * 32%
+    bracket2_rate = 0.0177  # 5.53% * 32%
+    bracket3_rate = 0.0186  # 5.80% * 32%
     
     tax = 0
     if taxable_wealth > 0:
@@ -142,14 +149,15 @@ with col2:
     
     with st.expander("💡 Understanding Tax Buffer"):
         st.markdown("""
-        The tax buffer is additional capital needed to cover the Dutch Box 3 wealth tax:
+        The tax buffer accounts for Dutch Box 3 wealth tax (2024 rates):
         
-        - Box 3 taxes your wealth above €57k (€114k for partners)
-        - We need extra capital to generate income to pay this tax
-        - Example: If Box 3 tax is €10k/year and withdrawal rate is 4%:
-          - Tax Buffer = €10k ÷ 4% = €250k extra capital needed
+        - First €57k is tax-free (€114k for partners)
+        - Up to €100k: 6.04% assumed return, taxed at 32% = 1.93% effective rate
+        - €100k to €1M: 5.53% assumed return, taxed at 32% = 1.77% effective rate
+        - Above €1M: 5.80% assumed return, taxed at 32% = 1.86% effective rate
         
-        This ensures your target monthly income remains intact after paying wealth tax.
+        The tax buffer is additional capital needed to generate income to pay this tax 
+        while maintaining your target monthly income.
         """)
 
 # Example validation
