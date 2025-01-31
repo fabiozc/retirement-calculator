@@ -36,7 +36,7 @@ st.markdown("""
         <h1 style="color: white; margin: 0;">Dutch Financial Freedom Calculator</h1>
         <p style="font-size: 1.2rem; opacity: 0.9;">
             Plan your path to financial independence in the Netherlands 🇳🇱<br>
-            Calculate how much capital you need to generate your desired income by your target age.
+            Calculate how much capital you need to generate your desired income by your target age, giving you the freedom to work because you want to, not because you have to.
         </p>
     </div>
 """, unsafe_allow_html=True)
@@ -91,7 +91,7 @@ left_col, right_col = st.columns([1, 1], gap="large")
 
 # Left column - Inputs
 with left_col:
-    st.markdown("### 🎯 Your Goals")
+    st.markdown("### 🕒 Time to financial freedom")
     
     col1, col2 = st.columns(2)
     with col1:
@@ -106,7 +106,6 @@ with left_col:
         st.stop()
     
     years_to_freedom = target_age - initial_age
-    st.info(f"🕒 Time to financial freedom: **{years_to_freedom} years**")
     
     st.markdown("---")  # Separator
     st.markdown("### 💶 Income & Investments")
@@ -115,11 +114,6 @@ with left_col:
         min_value=0, value=MONTHLY_INCOME_GOAL,
         help="How much monthly income you want your investments to generate",
         kwargs={"inputmode": "numeric"})
-    
-    st.info("""
-        💡 This is the monthly income you want your investments to generate,
-        giving you the freedom to work because you want to, not because you have to.
-    """)
     
     initial_investment = st.number_input("Current Investment Portfolio (€)",
         min_value=0, value=INITIAL_PORTFOLIO,
@@ -221,7 +215,12 @@ with left_col:
         
         st.markdown("##### Additional Options")
         has_partner = st.checkbox("Include Partner", value=False, key="partner_checkbox")
-        include_aow = st.checkbox("Include AOW", value=False, key="aow_checkbox")
+        
+        # Include AOW checkbox with help info
+        include_aow = st.checkbox("Include AOW", value=False, key="aow_checkbox", 
+            help="AOW (Algemene Ouderdomswet) is the Dutch state pension system that provides a basic pension to residents when they reach retirement age. "
+                 "It serves as a safety net for retirees, ensuring basic income, but is often supplemented by personal savings and other pension plans."
+        )
         
         # Calculate break-even rate for reference
         real_return = (1 + annual_return) / (1 + inflation_rate) - 1
