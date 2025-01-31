@@ -126,42 +126,191 @@ with left_col:
         help="Your current investment portfolio value",
         kwargs={"inputmode": "numeric"})
     
-    annual_return = st.slider("Annual Return (%)", min_value=5, max_value=100, value=ANNUAL_RETURN) / 100
+    # Annual return slider and info block
+    annual_return = st.slider(
+        "Annual Return (%)", 
+        min_value=5, 
+        max_value=100, 
+        value=ANNUAL_RETURN
+    ) / 100
+    
+    # Dynamic info block based on selected return
+    if annual_return <= 0.07:
+        st.info("""
+            📊 Conservative Return (5-7%)
+            Typical investments: Government bonds, high-grade corporate bonds
+            • Very low risk
+            • Stable but lower returns
+            • May not keep up with inflation
+        """)
+    elif annual_return <= 0.09:
+        st.info("""
+            📈 Low-Moderate Return (7-9%)
+            Typical investments: Mixed portfolio (bonds + some stocks)
+            • Low to moderate risk
+            • More stable than pure stocks
+            • Historical returns above inflation
+        """)
+    elif annual_return <= 0.11:
+        st.info("""
+            📈 Moderate Return (9-11%)
+            Typical investments: Stock market index funds
+            • Moderate risk
+            • Similar to S&P 500 historical returns
+            • Expect significant fluctuations
+        """)
+    elif annual_return <= 0.15:
+        st.warning("""
+            ⚠️ High Return (11-15%)
+            Typical investments: Growth stock portfolio
+            • High risk
+            • Large market fluctuations
+            • Requires long time horizon
+        """)
+    elif annual_return <= 0.25:
+        st.warning("""
+            ⚠️ Very High Return (15-25%)
+            Typical investments: Aggressive growth stocks, high-risk startups
+            • Very high risk
+            • Extreme market volatility
+            • Significant chance of losses
+            • Not sustainable long-term
+        """)
+    elif annual_return <= 0.50:
+        st.error("""
+            🚨 Speculative Return (25-50%)
+            Typical investments: Early-stage crypto, penny stocks, venture capital
+            • Extremely high risk
+            • Massive volatility
+            • High probability of significant losses
+            • More similar to gambling than investing
+            • Not suitable for retirement planning
+        """)
+    else:
+        st.error("""
+            🚨 Ultra-Speculative Return (>50%)
+            Typical investments: New cryptocurrencies, high-leverage trading
+            • Maximum risk level
+            • Extreme volatility (can lose everything)
+            • Similar to lottery odds
+            • Not considered investing
+            • Absolutely not suitable for retirement planning
+        """)
 
     # Advanced settings
     with st.expander("⚙️ Advanced Settings"):
         st.markdown("---")
         inflation_rate = st.slider("Inflation Rate (%)", min_value=0, max_value=20, value=INFLATION_RATE) / 100
         
-        # Calculate break-even withdrawal rate
+        # Calculate break-even rate for reference
         real_return = (1 + annual_return) / (1 + inflation_rate) - 1
         break_even_rate = real_return
         
         st.markdown("##### Withdrawal Strategy")
+        st.markdown("Select how much you plan to withdraw annually once you've reached your target investment portfolio:")
+        
+        # Add S&P 500 historical rate (approximately 10.2% annualized return for past 15 years)
+        SP500_HISTORICAL = 0.102
+        SP500_YEARS = 15  # Make it a constant for easy updates
+
+        withdrawal_strategy = st.radio(
+            "Choose your future withdrawal strategy",
+            options=["Match Annual Return", f"S&P 500 Historical ({SP500_YEARS}y)", "Conservative", "Moderate", "Aggressive", "Custom"],
+            index=0,
+            help="""
+            These rates determine how much you can safely withdraw each year after reaching your investment goal:
+            Match Annual Return: Matches your real investment return (after inflation)
+            S&P 500 Historical: Based on S&P 500 average return over past 15 years (~10.2%)
+            Conservative (3%): Very safe withdrawal rate, high probability of growing capital
+            Moderate (4%): Classic safe withdrawal rate, historically proven sustainable
+            Aggressive (5%): Higher withdrawals, some risk to capital over time
+            Custom: Set your own rate
+            """
+        )
+        
+        if withdrawal_strategy == "Match Annual Return":
+            withdrawal_rate = real_return
+            st.info(f"📊 {real_return*100:.1f}% - Matching your real investment return (after inflation) to preserve capital value")
+        elif withdrawal_strategy == "S&P 500 Historical":
+            withdrawal_rate = SP500_HISTORICAL
+            st.info(f"""
+                📈 {SP500_HISTORICAL*100:.1f}% - Based on S&P 500 historical performance ({SP500_YEARS} years: 2009-2023)
+                
+                Note: This rate:
+                • Is before inflation adjustment
+                • Doesn't account for market volatility
+                • Past performance doesn't guarantee future returns
+                • Might be too aggressive for stable retirement income
+                • Period includes exceptional bull market years
+            """)
+        elif withdrawal_strategy == "Conservative":
+            withdrawal_rate = 0.03
+            st.info("""
+                📊 3% - Very safe withdrawal rate
+                
+                • High probability of maintaining or growing capital
+                • Accounts for market downturns
+                • Provides buffer against inflation
+                • Common choice for early retirement
+            """)
+        elif withdrawal_strategy == "Moderate":
+            withdrawal_rate = 0.04
+            st.info("""
+                📈 4% - Classic 'safe withdrawal rate'
+                
+                • Based on extensive historical research (Trinity study)
+                • 95% success rate over 30-year periods
+                • Accounts for inflation adjustments
+                • Balance between income and preservation
+            """)
+        elif withdrawal_strategy == "Aggressive":
+            withdrawal_rate = 0.05
+            st.warning("""
+                ⚠️ 5% - Higher withdrawal rate
+                
+                • May deplete capital in poor market conditions
+                • Less buffer against high inflation
+                • Requires more active portfolio management
+                • Consider reducing in market downturns
+            """)
+        else:  # Custom
+            withdrawal_rate = st.slider(
+                "Future Annual Withdrawal Rate (%)", 
+                min_value=2.0, 
+                max_value=20.0, 
+                value=4.0, 
+                step=0.1,
+                help="Choose the percentage you'll withdraw annually after reaching your investment goal"
+            ) / 100
+            
+            if withdrawal_rate > real_return:
+                st.warning(f"""
+                    ⚠️ Once you reach your goal, a rate above {real_return*100:.1f}% (real return) will gradually deplete capital
+                    
+                    Consider:
+                    • Market volatility risk
+                    • Inflation impact
+                    • Longevity of your portfolio
+                    • Having a flexible withdrawal strategy
+                """)
+            elif withdrawal_rate < real_return:
+                st.info("""
+                    ℹ️ This rate will allow your capital to grow in real terms after reaching your goal
+                    
+                    Benefits:
+                    • Growing portfolio over time
+                    • Better protection against inflation
+                    • More buffer for market downturns
+                    • Possibility to increase withdrawals later
+                """)
+        
         st.info(f"""
         💡 Based on your inputs:
         - Annual Return: {annual_return*100:.1f}%
         - Inflation: {inflation_rate*100:.1f}%
-        - Break-even Rate: {break_even_rate*100:.1f}% (this preserves your capital in real terms)
+        - Real Return: {real_return*100:.1f}%
+        - Selected Future Withdrawal Rate: {withdrawal_rate*100:.1f}%
         """)
-        
-        use_custom_withdrawal = st.checkbox("Customize withdrawal rate", 
-            help="Default uses break-even rate to preserve capital")
-        
-        if use_custom_withdrawal:
-            withdrawal_rate = st.slider("Annual Withdrawal Rate (%)", 
-                min_value=2.0, max_value=20.0, value=break_even_rate*100, step=0.1,
-                help="Higher rates increase risk of depleting savings") / 100
-            
-            if withdrawal_rate > break_even_rate:
-                st.warning(f"⚠️ Rate above {break_even_rate*100:.1f}% will gradually deplete capital")
-            elif withdrawal_rate < break_even_rate:
-                st.info("ℹ️ Rate below break-even - your capital will grow in real terms")
-            else:
-                st.success("✓ Rate matches break-even - this preserves your capital's purchasing power")
-        else:
-            withdrawal_rate = break_even_rate
-            st.success(f"Using {withdrawal_rate*100:.1f}% withdrawal rate (break-even) to preserve capital value")
         
         has_partner = st.checkbox("Include Partner", value=False)
         include_aow = st.checkbox("Include AOW", value=False)
