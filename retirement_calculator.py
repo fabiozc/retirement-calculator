@@ -11,7 +11,7 @@ st.set_page_config(
 # Initial values
 INITIAL_AGE = 30
 TARGET_AGE = 50
-MONTHLY_INCOME_GOAL = 5000
+MONTHLY_INCOME_GOAL = 3000
 INITIAL_PORTFOLIO = 50000
 ANNUAL_RETURN = 12  # in percentage
 INFLATION_RATE = 3  # in percentage
@@ -202,9 +202,9 @@ with left_col:
             • More stable than pure stocks
             • Historical returns above inflation
         """)
-    elif annual_return <= 0.11:
+    elif annual_return <= 0.12:
         st.info("""
-            📈 Moderate Return (9-11%)
+            📈 Moderate Return (9-12%)
             Typical investments: Stock market index funds
             • Moderate risk
             • Similar to S&P 500 historical returns
@@ -212,7 +212,7 @@ with left_col:
         """)
     elif annual_return <= 0.15:
         st.warning("""
-            ⚠️ High Return (11-15%)
+            ⚠️ High Return (12-15%)
             Typical investments: Growth stock portfolio
             • High risk
             • Large market fluctuations
@@ -440,16 +440,12 @@ with right_col:
             help="Includes Box 3 wealth tax buffer"
         )
     with col2:
+        # Monthly investment needed
         st.metric(
             label="Required Monthly Investment",
             value=f"€{monthly_savings:,.2f}/month",
             help="Monthly investment needed to reach your freedom goal"
         )
-
-    
-    
-    # Monthly investment needed
-    
     
     # Additional details in expander
     with st.expander("View Details"):
