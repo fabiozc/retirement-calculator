@@ -133,10 +133,10 @@ with left_col:
     
     # Create the slider with appropriate range
     annual_return = st.slider(
-        "Annual Return (%)", 
+        "Annual Return (%, before inflation)", 
         min_value=5, 
         max_value=100 if go_crazy else 25,
-        value=min(int(ANNUAL_RETURN), 25) if not go_crazy else int(ANNUAL_RETURN),
+        value=ANNUAL_RETURN,  # Use the initial constant directly
         step=5 if go_crazy else 1,
         key="annual_return_slider"
     ) / 100
@@ -230,41 +230,52 @@ with left_col:
         st.markdown("##### Withdrawal Strategy")
         st.markdown("Select how much you plan to withdraw annually once you've reached your target investment portfolio:")
         
-        # Add S&P 500 historical rate (approximately 10.2% annualized return for past 15 years)
-        SP500_HISTORICAL = 0.102
-        SP500_YEARS = 15  # Make it a constant for easy updates
+        # Set the S&P 500 historical average return for the last 15 years excluding inflation
+        SP500_HISTORICAL = 0.126  # 12.6% average return
+        SP500_YEARS = 15  # Last 15 years including 2024
+
+        # Calculate the real return for S&P 500 after inflation
+        real_sp500_return = SP500_HISTORICAL - inflation_rate
 
         withdrawal_strategy = st.radio(
             "Choose your future withdrawal strategy",
-            options=["Match Annual Return", f"S&P 500 Historical ({SP500_YEARS}y)", "Conservative", "Moderate", "Aggressive", "Custom"],
+            options=[
+                "Match Annual Return - Based on real investment return (after inflation)",
+                f"S&P 500 Historical ({SP500_HISTORICAL*100:.1f}%. {real_sp500_return*100:.1f}% adjusted for inflation) - Based on S&P 500 average return over past {SP500_YEARS} years",
+                "Conservative (3%) - Very safe withdrawal rate, high probability of growing capital",
+                "Moderate (4%) - Classic safe withdrawal rate, historically proven sustainable",
+                "Aggressive (5%) - Higher withdrawals, some risk to capital over time",
+                "Custom - Set your own rate"
+            ],
             index=0,
             help="""
             These rates determine how much you can safely withdraw each year after reaching your investment goal:
             Match Annual Return: Matches your real investment return (after inflation)
-            S&P 500 Historical: Based on S&P 500 average return over past 15 years (~10.2%)
+            S&P 500 Historical: Based on S&P 500 average return over past 15 years (12.6%)
             Conservative (3%): Very safe withdrawal rate, high probability of growing capital
             Moderate (4%): Classic safe withdrawal rate, historically proven sustainable
             Aggressive (5%): Higher withdrawals, some risk to capital over time
             Custom: Set your own rate
             """
         )
-        
-        if withdrawal_strategy == "Match Annual Return":
+
+        # Get withdrawal rate based on strategy
+        if withdrawal_strategy == "Match Annual Return - Based on real investment return (after inflation)":
             withdrawal_rate = real_return
             st.info(f"📊 {real_return*100:.1f}% - Matching your real investment return (after inflation) to preserve capital value")
-        elif withdrawal_strategy == "S&P 500 Historical":
-            withdrawal_rate = SP500_HISTORICAL
+        elif withdrawal_strategy == f"S&P 500 Historical ({SP500_HISTORICAL*100:.1f}%. {real_sp500_return*100:.1f}% adjusted for inflation) - Based on S&P 500 average return over past {SP500_YEARS} years":
+            withdrawal_rate = real_sp500_return
             st.info(f"""
-                📈 {SP500_HISTORICAL*100:.1f}% - Based on S&P 500 historical performance ({SP500_YEARS} years: 2009-2023)
+                📈 {real_sp500_return*100:.1f}% - Based on S&P 500 historical performance ({SP500_YEARS} years: 2009-2024) adjusted for inflation
                 
                 Note: This rate:
-                • Is before inflation adjustment
+                • Is after inflation adjustment
                 • Doesn't account for market volatility
                 • Past performance doesn't guarantee future returns
                 • Might be too aggressive for stable retirement income
                 • Period includes exceptional bull market years
             """)
-        elif withdrawal_strategy == "Conservative":
+        elif withdrawal_strategy == "Conservative (3%) - Very safe withdrawal rate, high probability of growing capital":
             withdrawal_rate = 0.03
             st.info("""
                 📊 3% - Very safe withdrawal rate
@@ -274,7 +285,7 @@ with left_col:
                 • Provides buffer against inflation
                 • Common choice for early retirement
             """)
-        elif withdrawal_strategy == "Moderate":
+        elif withdrawal_strategy == "Moderate (4%) - Classic safe withdrawal rate, historically proven sustainable":
             withdrawal_rate = 0.04
             st.info("""
                 📈 4% - Classic 'safe withdrawal rate'
@@ -284,7 +295,7 @@ with left_col:
                 • Accounts for inflation adjustments
                 • Balance between income and preservation
             """)
-        elif withdrawal_strategy == "Aggressive":
+        elif withdrawal_strategy == "Aggressive (5%) - Higher withdrawals, some risk to capital over time":
             withdrawal_rate = 0.05
             st.warning("""
                 ⚠️ 5% - Higher withdrawal rate
