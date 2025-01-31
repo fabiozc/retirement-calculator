@@ -197,10 +197,20 @@ with left_col:
             • Absolutely not suitable for retirement planning
         """)
 
-    # Advanced settings
+    # Advanced Settings
     with st.expander("⚙️ Advanced Settings"):
-        st.markdown("---")
-        inflation_rate = st.slider("Inflation Rate (%)", min_value=0, max_value=20, value=INFLATION_RATE) / 100
+        st.markdown("##### Key Assumptions")
+        inflation_rate = st.slider("Inflation Rate (%)", 
+            min_value=0, 
+            max_value=20, 
+            value=INFLATION_RATE,
+            step=1,
+            key="inflation_slider"
+        ) / 100
+        
+        st.markdown("##### Additional Options")
+        has_partner = st.checkbox("Include Partner", value=False, key="partner_checkbox")
+        include_aow = st.checkbox("Include AOW", value=False, key="aow_checkbox")
         
         # Calculate break-even rate for reference
         real_return = (1 + annual_return) / (1 + inflation_rate) - 1
@@ -312,8 +322,12 @@ with left_col:
         - Selected Future Withdrawal Rate: {withdrawal_rate*100:.1f}%
         """)
         
-        has_partner = st.checkbox("Include Partner", value=False)
-        include_aow = st.checkbox("Include AOW", value=False)
+        st.markdown("---")
+        st.markdown("##### Experimental")
+        go_crazy = st.checkbox("Go Crazy 🤪 on Annual Returns", 
+            value=False,
+            help="Enable extremely speculative return rates (not recommended for retirement planning)",
+            key="crazy_mode_checkbox")
 
     # Calculate AOW benefit
     if include_aow:
