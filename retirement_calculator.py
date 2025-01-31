@@ -188,41 +188,76 @@ with left_col:
     years_to_grow = target_age - initial_age
     monthly_savings = calculate_monthly_savings(required_capital, initial_investment, real_return, years_to_grow)
 
+    # Calculate monthly pre-tax income
+    monthly_pre_tax = (required_capital * withdrawal_rate) / 12
+
 # Right column - Analysis
 with right_col:
     st.markdown("### 📊 Financial Freedom Analysis")
     
-    # Monthly Income section
-    st.markdown("#### Monthly Income")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.metric("Target Income", f"€{monthly_income_goal:,.2f}")
-    with col2:
+    # Main required amount
+    st.markdown(f"#### Target: €{monthly_income_goal:,.2f}/month from Age {target_age}")
+    st.metric(
+        label="Required Investment Portfolio",
+        value=f"€{required_capital:,.2f}",
+        help="Includes Box 3 wealth tax buffer"
+    )
+    
+    st.markdown("<br>", unsafe_allow_html=True)  # Add spacing
+    
+    # Monthly investment needed
+    st.metric(
+        label="Required Monthly Investment",
+        value=f"€{monthly_savings:,.2f}/month",
+        help="Monthly investment needed to reach your freedom goal"
+    )
+    
+    # Additional details in expander
+    with st.expander("View Details"):
+        st.markdown("##### Target Monthly Income")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Desired Income", f"€{monthly_income_goal:,.2f}")
+        with col2:
+            if include_aow:
+                st.metric("From Investments", f"€{(monthly_income_goal - monthly_aow):,.2f}")
+        
+        st.markdown("##### Portfolio Breakdown")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Base Portfolio", f"€{base_required_capital:,.2f}")
+        with col2:
+            st.metric("Tax Buffer", f"€{tax_buffer:,.2f}")
+        
+        st.markdown("##### Key Assumptions")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Annual Return", f"{annual_return*100:.1f}%")
+        with col2:
+            st.metric("Inflation Rate", f"{inflation_rate*100:.1f}%")
+        with col3:
+            st.metric("Real Return", f"{real_return*100:.1f}%")
+        
+        st.markdown("##### Withdrawal Strategy")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Withdrawal Rate", f"{withdrawal_rate*100:.1f}%")
+        with col2:
+            st.metric("Break-even Rate", f"{break_even_rate*100:.1f}%")
+        
         if include_aow:
-            st.metric("Required from Investments", f"€{(monthly_income_goal - monthly_aow):,.2f}")
-    
-    # Portfolio Needs section
-    st.markdown("#### Investment Portfolio Needs")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.metric("Base Portfolio", f"€{base_required_capital:,.2f}")
-    with col2:
-        st.metric("Total Required", f"€{required_capital:,.2f}")
-    
-    st.markdown("---")  # Separator
-    
-    # Monthly Investment section
-    st.markdown("#### Required Monthly Investment")
-    st.metric("To reach your freedom goal", f"€{monthly_savings:,.2f}/month")
-
-    st.markdown("---")  # Separator
+            st.markdown("##### AOW Details")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.metric("Monthly AOW", f"€{monthly_aow:,.2f}")
+            with col2:
+                st.metric("Partner Included", "Yes" if has_partner else "No")
 
     # Validation section
-    st.write("#### Validation")
-    annual_withdrawal = required_capital * withdrawal_rate
-    monthly_withdrawal = annual_withdrawal / 12
-    st.write(f"This capital would provide €{monthly_withdrawal:,.2f}/month before tax")
-    st.write(f"After annual Box 3 tax of €{annual_tax:,.2f}, effective monthly income: €{(annual_withdrawal - annual_tax)/12:,.2f}")
+    st.markdown("---")
+    st.markdown("### Income Verification")
+    st.markdown(f"This investment portfolio would generate €{monthly_pre_tax:.2f}/month before tax")
+    st.markdown(f"After annual Box 3 tax of €{annual_tax:.2f}, effective monthly income: €{monthly_income_goal:.2f}")
     
     with st.expander("💡 Understanding Tax Buffer"):
         st.markdown("""
@@ -236,3 +271,16 @@ with right_col:
         The tax buffer is additional capital needed to generate income to pay this tax 
         while maintaining your target monthly income.
         """)
+
+# Footer disclaimer
+st.markdown("<br><br><br>", unsafe_allow_html=True)  # Add some space
+st.markdown("---")
+st.markdown("<br>", unsafe_allow_html=True)  # Add some space
+st.caption("""
+    ⚠️ This calculator is for educational and illustrative purposes only. It provides a simplified simulation based on the inputs and assumptions you provide. 
+    Not financial advice: The information presented here does not constitute financial advice, investment advice, trading advice, or any other sort of advice. 
+    The calculations and projections are approximations and may not reflect real-world outcomes. Tax calculations are simplified and may not account for all regulations or future changes. 
+    Do your own research: Before making any financial decisions, consult with qualified financial advisors, tax professionals, and legal experts. 
+    Investment returns are not guaranteed, and past performance does not indicate future results. The actual results may vary significantly from these projections. 
+    By using this calculator, you acknowledge that any decisions you make based on this information are at your own risk.
+""")
