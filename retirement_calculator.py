@@ -54,6 +54,16 @@ st.markdown("""
             margin-bottom: 2rem;
             color: white;
         }
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;  /* Stack items vertically on small screens */
+                align-items: flex-start;  /* Align items to the start */
+                padding: 1rem;  /* Reduce padding for smaller screens */
+            }
+            .header > div {
+                margin-bottom: 1rem;  /* Add space between title and button */
+            }
+        }
     </style>
     <div class="header">
         <div>
