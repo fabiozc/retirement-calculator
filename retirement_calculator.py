@@ -127,12 +127,23 @@ with left_col:
         kwargs={"inputmode": "numeric"})
     
     # Annual return slider and info block
+    st.markdown("##### Investment Return")
+    # Get go_crazy value from checkbox
+    go_crazy = st.session_state.get('crazy_mode_checkbox', False)
+    
+    # Create the slider with appropriate range
     annual_return = st.slider(
         "Annual Return (%)", 
         min_value=5, 
-        max_value=100, 
-        value=ANNUAL_RETURN
+        max_value=100 if go_crazy else 25,
+        value=min(int(ANNUAL_RETURN), 25) if not go_crazy else int(ANNUAL_RETURN),
+        step=5 if go_crazy else 1,
+        key="annual_return_slider"
     ) / 100
+
+    # Show warning in crazy mode for high values
+    if go_crazy and annual_return > 0.25:
+        st.error("⚠️ Warning: You're in crazy mode! These returns are extremely unrealistic for long-term planning.")
     
     # Dynamic info block based on selected return
     if annual_return <= 0.07:
