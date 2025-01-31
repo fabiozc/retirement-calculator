@@ -225,8 +225,9 @@ with left_col:
         # Calculate break-even rate for reference
         real_return = (1 + annual_return) / (1 + inflation_rate) - 1
         break_even_rate = real_return
-        
-        st.markdown("##### Withdrawal Strategy")
+
+    # Withdrawal Strategy Expander
+    with st.expander("💰 Withdrawal Strategy"):
         st.markdown("Select how much you plan to withdraw annually once you've reached your target investment portfolio:")
         
         # Set the S&P 500 historical average return for the last 15 years excluding inflation
@@ -342,9 +343,10 @@ with left_col:
         - Real Return: {real_return*100:.1f}%
         - Selected Future Withdrawal Rate: {withdrawal_rate*100:.1f}%
         """)
-        
-        st.markdown("---")
-        st.markdown("##### Experimental")
+
+    # Experimental Expander
+    with st.expander("⚙️ Experimental"):
+        st.markdown("##### Additional Options")
         go_crazy = st.checkbox("Go Crazy 🤪 on Annual Returns", 
             value=False,
             help="Enable extremely speculative return rates (not recommended for retirement planning)",
