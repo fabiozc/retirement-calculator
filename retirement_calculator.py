@@ -3,10 +3,35 @@ import numpy as np
 
 # Set wide layout mode
 st.set_page_config(
-    page_title='Netherlands Financial Freedom Calculator',
+    page_title='Dutch Financial Freedom Calculator',
     layout="wide",
     initial_sidebar_state="collapsed"
 )
+
+# Initialize variables at the start
+has_partner = False
+include_aow = False
+monthly_aow = 0
+withdrawal_rate = 0
+real_return = 0
+break_even_rate = 0
+
+# Title section with gradient background
+st.markdown("""
+    <div style="
+        background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+        padding: 2rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        color: white;
+        ">
+        <h1 style="color: white; margin: 0;">Dutch Financial Freedom Calculator</h1>
+        <p style="font-size: 1.2rem; opacity: 0.9;">
+            Plan your path to financial independence in the Netherlands 🇳🇱<br>
+            Calculate how much capital you need to generate your desired income by your target age.
+        </p>
+    </div>
+""", unsafe_allow_html=True)
 
 def calculate_monthly_savings(goal, current, annual_rate, years):
     if annual_rate <= -1:  # Handle extreme negative real returns
@@ -53,112 +78,61 @@ def calculate_box3_tax(wealth, has_partner):
 aow_single = 1452.06  # Monthly AOW for singles
 aow_partner = 994.81   # Monthly AOW per person for couples
 
-st.title('Netherlands Financial Freedom Calculator')
-st.caption("""
-    Plan your path to financial independence in the Netherlands 🇳🇱 
-    Calculate how much capital you need to generate your desired income by your target age.
-""")
-
-# Create two main columns for the entire app
+# Create two main columns
 left_col, right_col = st.columns([1, 1], gap="large")
 
 # Left column - Inputs
 with left_col:
-    st.write("### Your Goals")
-    initial_age = st.number_input("Current Age", min_value=18, max_value=80, value=38, 
-        key="initial_age", help="Your current age", kwargs={"inputmode": "numeric"})
-    target_age = st.number_input("Target Freedom Age", min_value=30, max_value=80, value=45,
-        key="retirement_age", help="Age when you want to achieve financial freedom", 
-        kwargs={"inputmode": "numeric"})
+    st.markdown("### 🎯 Your Goals")
     
-    # Validate ages
+    col1, col2 = st.columns(2)
+    with col1:
+        initial_age = st.number_input("Current Age", min_value=18, max_value=80, value=38,
+            help="Your current age", kwargs={"inputmode": "numeric"})
+    with col2:
+        target_age = st.number_input("Target Freedom Age", min_value=30, max_value=80, value=45,
+            help="Age when you want to achieve financial freedom", kwargs={"inputmode": "numeric"})
+    
     if target_age <= initial_age:
         st.error("⚠️ Target age must be greater than your current age")
         st.stop()
     
     years_to_freedom = target_age - initial_age
-    st.caption(f"Time to financial freedom: {years_to_freedom} years")
+    st.info(f"🕒 Time to financial freedom: **{years_to_freedom} years**")
     
-    st.write("##### Desired Monthly Income")
-    monthly_income_goal = st.number_input("Monthly After-Tax Income Goal (€)", 
-        min_value=0, value=5000, key="monthly_income", 
-        help="How much monthly income you want your investments to generate", 
+    st.markdown("---")  # Separator
+    st.markdown("### 💶 Income & Investments")
+    
+    monthly_income_goal = st.number_input("Monthly After-Tax Income Goal (€)",
+        min_value=0, value=5000,
+        help="How much monthly income you want your investments to generate",
         kwargs={"inputmode": "numeric"})
     
     st.info("""
-        💡 This is the monthly income you want your investments to generate, 
+        💡 This is the monthly income you want your investments to generate,
         giving you the freedom to work because you want to, not because you have to.
     """)
     
-    initial_investment = st.number_input("Current Investment Portfolio (€)", min_value=0, value=90000,
-        key="initial_investment", help="Your current investment portfolio value", 
+    initial_investment = st.number_input("Current Investment Portfolio (€)",
+        min_value=0, value=90000,
+        help="Your current investment portfolio value",
         kwargs={"inputmode": "numeric"})
+    
     annual_return = st.slider("Annual Return (%)", min_value=5, max_value=100, value=12) / 100
 
-    # Advanced settings in expander
-    with st.expander("Advanced Settings"):
-        inflation_rate = st.slider("Inflation Rate (%)", min_value=0, max_value=20, value=2) / 100
+    # Advanced settings
+    with st.expander("⚙️ Advanced Settings"):
+        inflation_rate = st.slider("Inflation Rate (%)", min_value=0, max_value=20, value=3) / 100
         
         # Calculate break-even withdrawal rate
         real_return = (1 + annual_return) / (1 + inflation_rate) - 1
         break_even_rate = real_return
+        withdrawal_rate = break_even_rate
         
-        st.write("##### Withdrawal Rate")
-        st.info(f"""
-        💡 Based on your inputs:
-        - Annual Return: {annual_return*100:.1f}%
-        - Inflation: {inflation_rate*100:.1f}%
-        - Break-even Rate: {break_even_rate*100:.1f}% (this preserves your capital in real terms)
-        """)
-        
-        use_custom_withdrawal = st.checkbox("Customize withdrawal rate", 
-            help="Default uses break-even rate to preserve capital")
-        
-        if use_custom_withdrawal:
-            withdrawal_rate = st.slider("Annual Withdrawal Rate (%)", 
-                min_value=2.0, max_value=8.0, value=break_even_rate*100, step=0.1,
-                help="Higher rates increase risk of depleting savings") / 100
-            
-            if withdrawal_rate > break_even_rate:
-                st.warning(f"⚠️ Rate above {break_even_rate*100:.1f}% will gradually deplete capital")
-            elif withdrawal_rate < break_even_rate:
-                st.info("ℹ️ Rate below break-even - your capital will grow in real terms")
-            else:
-                st.success("✓ Rate matches break-even - this preserves your capital's purchasing power")
-            
-            st.caption("""
-            Common withdrawal strategies:
-            - Below break-even rate: Grow capital
-            - At break-even rate: Preserve capital (recommended)
-            - 4% Rule: Traditional retirement rule (may deplete capital)
-            - Above break-even: Gradually spend down capital
-            """)
-        else:
-            withdrawal_rate = break_even_rate  # Default to break-even rate
-            st.success(f"Using {withdrawal_rate*100:.1f}% withdrawal rate (break-even) to preserve capital value")
-        
-        has_partner = st.checkbox("Include Partner", value=False,
-            help="Tax benefits for fiscal partners")
-        include_aow = st.checkbox("Include AOW", value=False,
-            help="Include Dutch state pension in calculations")
-        
-        if include_aow:
-            st.caption("ℹ️ About AOW (Dutch State Pension)")
-            st.caption("""
-            AOW is the Dutch state pension, providing basic income at retirement age:
-            • Single person: €1,452.06/month
-            • With partner: €994.81/month per person
+        has_partner = st.checkbox("Include Partner", value=False)
+        include_aow = st.checkbox("Include AOW", value=False)
 
-            Note: Requires NL residency/work history. Each year not in NL (ages 15-67) reduces AOW by 2%. 
-            Amounts shown are 2024 rates. Retirement age is currently 67 years.
-            """)
-
-# Right column - Analysis
-with right_col:
-    st.write("### Financial Freedom Analysis")
-    
-    # Calculate monthly AOW benefit
-    monthly_aow = 0
+    # Calculate AOW benefit
     if include_aow:
         if has_partner:
             monthly_aow = aow_partner * 2
@@ -169,65 +143,53 @@ with right_col:
     annual_spending = monthly_income_goal * 12
     annual_aow = monthly_aow * 12
     annual_income_needed_from_savings = annual_spending - annual_aow
+    base_required_capital = annual_income_needed_from_savings / withdrawal_rate if withdrawal_rate > 0 else 0
 
-    # Base capital calculation using withdrawal rate
-    base_required_capital = annual_income_needed_from_savings / withdrawal_rate
-
-    # Calculate final required capital including tax buffer
-    required_capital = base_required_capital
-    annual_tax = calculate_box3_tax(required_capital, has_partner)
-    tax_buffer = annual_tax / withdrawal_rate
+    # Calculate tax and total required
+    annual_tax = calculate_box3_tax(base_required_capital, has_partner)
+    tax_buffer = annual_tax / withdrawal_rate if withdrawal_rate > 0 else 0
     required_capital = base_required_capital + tax_buffer
 
-    # Set goal investment for monthly savings calculation
-    goal_investment = required_capital
+    # Calculate monthly savings needed
+    years_to_grow = target_age - initial_age
+    monthly_savings = calculate_monthly_savings(required_capital, initial_investment, real_return, years_to_grow)
 
-    # Display results in a single column
-    st.write("#### Monthly Income")
-    st.write(f"Target Income: €{monthly_income_goal:,.2f}")
-    if include_aow:
-        st.write(f"Optional AOW Benefit: €{monthly_aow:,.2f}")
-        st.write(f"Required from Investments: €{(monthly_income_goal - monthly_aow):,.2f}")
+# Right column - Analysis
+with right_col:
+    st.markdown("### 📊 Financial Freedom Analysis")
+    
+    # Monthly Income section
+    st.markdown("#### Monthly Income")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Target Income", f"€{monthly_income_goal:,.2f}")
+    with col2:
+        if include_aow:
+            st.metric("Required from Investments", f"€{(monthly_income_goal - monthly_aow):,.2f}")
+    
+    # Portfolio Needs section
+    st.markdown("#### Investment Portfolio Needs")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Base Portfolio", f"€{base_required_capital:,.2f}")
+    with col2:
+        st.metric("Total Required", f"€{required_capital:,.2f}")
+    
+    st.markdown("---")  # Separator
+    
+    # Monthly Investment section
+    st.markdown("#### Required Monthly Investment")
+    st.metric("To reach your freedom goal", f"€{monthly_savings:,.2f}/month")
 
-    st.write("#### Investment Portfolio Needs")
-    st.write(f"Base Portfolio: €{base_required_capital:,.2f}")
-    with st.expander("💡 Understanding these numbers"):
-        st.markdown(f"""
-        Portfolio calculation:
-        - Desired monthly income: €{monthly_income_goal:,.2f}
-        - Annual income needed: €{annual_income_needed_from_savings:,.2f}
-        - Sustainable withdrawal rate: {withdrawal_rate*100:.1f}% ({
-            "matches investment returns after inflation - preserves capital" if withdrawal_rate == break_even_rate 
-            else "custom rate - see notes on capital impact"})
-        - Formula: Annual income ÷ Withdrawal rate
-        - €{annual_income_needed_from_savings:,.2f} ÷ {withdrawal_rate:.3f} = €{base_required_capital:,.2f}
-        
-        This portfolio size should sustainably generate your target income using 
-        the selected withdrawal rate. A rate matching investment returns after inflation ({break_even_rate*100:.1f}%) 
-        helps preserve your capital's purchasing power over time.
-        """)
+    st.markdown("---")  # Separator
 
-    st.write("#### Capital Needs")
-    st.write(f"Base Capital: €{base_required_capital:,.2f}")
-    with st.expander("💡 Why this amount?"):
-        st.markdown(f"""
-        Base Capital calculation:
-        - Monthly income goal: €{monthly_income_goal:,.2f}
-        - Annual income needed: €{annual_income_needed_from_savings:,.2f}
-        - Withdrawal rate: {withdrawal_rate*100:.1f}% ({
-            "matches inflation - preserves capital" if withdrawal_rate == inflation_rate 
-            else "custom rate - see notes on capital impact"})
-        - Formula: Annual income ÷ Withdrawal rate
-        - €{annual_income_needed_from_savings:,.2f} ÷ {withdrawal_rate:.3f} = €{base_required_capital:,.2f}
-        
-        This is the amount needed to generate your target income using 
-        the selected withdrawal rate. A rate matching inflation ({inflation_rate*100:.1f}%) 
-        helps preserve your capital's purchasing power over time.
-        """)
-    st.write(f"Annual Box 3 Tax: €{annual_tax:,.2f}")
-    st.write(f"Tax Buffer: €{tax_buffer:,.2f}")
-    st.write(f"Total Required: €{required_capital:,.2f}")
-
+    # Validation section
+    st.write("#### Validation")
+    annual_withdrawal = required_capital * withdrawal_rate
+    monthly_withdrawal = annual_withdrawal / 12
+    st.write(f"This capital would provide €{monthly_withdrawal:,.2f}/month before tax")
+    st.write(f"After annual Box 3 tax of €{annual_tax:,.2f}, effective monthly income: €{(annual_withdrawal - annual_tax)/12:,.2f}")
+    
     with st.expander("💡 Understanding Tax Buffer"):
         st.markdown("""
         The tax buffer accounts for Dutch Box 3 wealth tax (2024 rates):
@@ -240,20 +202,3 @@ with right_col:
         The tax buffer is additional capital needed to generate income to pay this tax 
         while maintaining your target monthly income.
         """)
-
-    # Validation section
-    st.write("#### Validation")
-    annual_withdrawal = required_capital * withdrawal_rate
-    monthly_withdrawal = annual_withdrawal / 12
-    st.write(f"This capital would provide €{monthly_withdrawal:,.2f}/month before tax")
-    st.write(f"After annual Box 3 tax of €{annual_tax:,.2f}, effective monthly income: €{(annual_withdrawal - annual_tax)/12:,.2f}")
-
-    # Calculate and display monthly savings requirement
-    years_to_grow = target_age - initial_age
-    monthly_savings = calculate_monthly_savings(goal_investment, initial_investment, real_return, years_to_grow)
-    st.write("#### Monthly Investment Needed")
-    st.write(f"To reach your freedom goal: €{monthly_savings:,.2f}/month")
-    st.caption("""
-        This is how much you need to invest monthly to build your portfolio, 
-        assuming consistent returns and regular investments.
-    """)
