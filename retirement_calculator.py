@@ -8,7 +8,15 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Initialize variables at the start
+# Initial values
+INITIAL_AGE = 30
+TARGET_AGE = 50
+MONTHLY_INCOME_GOAL = 5000
+INITIAL_PORTFOLIO = 50000
+ANNUAL_RETURN = 12  # in percentage
+INFLATION_RATE = 3  # in percentage
+
+# Initialize calculation variables
 has_partner = False
 include_aow = False
 monthly_aow = 0
@@ -87,10 +95,10 @@ with left_col:
     
     col1, col2 = st.columns(2)
     with col1:
-        initial_age = st.number_input("Current Age", min_value=18, max_value=80, value=38,
+        initial_age = st.number_input("Current Age", min_value=18, max_value=80, value=INITIAL_AGE,
             help="Your current age", kwargs={"inputmode": "numeric"})
     with col2:
-        target_age = st.number_input("Target Freedom Age", min_value=30, max_value=80, value=45,
+        target_age = st.number_input("Target Freedom Age", min_value=30, max_value=80, value=TARGET_AGE,
             help="Age when you want to achieve financial freedom", kwargs={"inputmode": "numeric"})
     
     if target_age <= initial_age:
@@ -104,7 +112,7 @@ with left_col:
     st.markdown("### 💶 Income & Investments")
     
     monthly_income_goal = st.number_input("Monthly After-Tax Income Goal (€)",
-        min_value=0, value=5000,
+        min_value=0, value=MONTHLY_INCOME_GOAL,
         help="How much monthly income you want your investments to generate",
         kwargs={"inputmode": "numeric"})
     
@@ -114,20 +122,46 @@ with left_col:
     """)
     
     initial_investment = st.number_input("Current Investment Portfolio (€)",
-        min_value=0, value=90000,
+        min_value=0, value=INITIAL_PORTFOLIO,
         help="Your current investment portfolio value",
         kwargs={"inputmode": "numeric"})
     
-    annual_return = st.slider("Annual Return (%)", min_value=5, max_value=100, value=12) / 100
+    annual_return = st.slider("Annual Return (%)", min_value=5, max_value=100, value=ANNUAL_RETURN) / 100
 
     # Advanced settings
     with st.expander("⚙️ Advanced Settings"):
-        inflation_rate = st.slider("Inflation Rate (%)", min_value=0, max_value=20, value=3) / 100
+        st.markdown("---")
+        inflation_rate = st.slider("Inflation Rate (%)", min_value=0, max_value=20, value=INFLATION_RATE) / 100
         
         # Calculate break-even withdrawal rate
         real_return = (1 + annual_return) / (1 + inflation_rate) - 1
         break_even_rate = real_return
-        withdrawal_rate = break_even_rate
+        
+        st.markdown("##### Withdrawal Strategy")
+        st.info(f"""
+        💡 Based on your inputs:
+        - Annual Return: {annual_return*100:.1f}%
+        - Inflation: {inflation_rate*100:.1f}%
+        - Break-even Rate: {break_even_rate*100:.1f}% (this preserves your capital in real terms)
+        """)
+        
+        use_custom_withdrawal = st.checkbox("Customize withdrawal rate", 
+            help="Default uses break-even rate to preserve capital")
+        
+        if use_custom_withdrawal:
+            withdrawal_rate = st.slider("Annual Withdrawal Rate (%)", 
+                min_value=2.0, max_value=20.0, value=break_even_rate*100, step=0.1,
+                help="Higher rates increase risk of depleting savings") / 100
+            
+            if withdrawal_rate > break_even_rate:
+                st.warning(f"⚠️ Rate above {break_even_rate*100:.1f}% will gradually deplete capital")
+            elif withdrawal_rate < break_even_rate:
+                st.info("ℹ️ Rate below break-even - your capital will grow in real terms")
+            else:
+                st.success("✓ Rate matches break-even - this preserves your capital's purchasing power")
+        else:
+            withdrawal_rate = break_even_rate
+            st.success(f"Using {withdrawal_rate*100:.1f}% withdrawal rate (break-even) to preserve capital value")
         
         has_partner = st.checkbox("Include Partner", value=False)
         include_aow = st.checkbox("Include AOW", value=False)
