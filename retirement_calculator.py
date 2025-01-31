@@ -24,20 +24,51 @@ withdrawal_rate = 0
 real_return = 0
 break_even_rate = 0
 
-# Title section with gradient background
+# Title section with gradient background and button in the right corner
 st.markdown("""
-    <div style="
-        background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
-        padding: 2rem;
-        border-radius: 10px;
-        margin-bottom: 2rem;
-        color: white;
-        ">
-        <h1 style="color: white; margin: 0;">Dutch Financial Freedom Calculator</h1>
-        <p style="font-size: 1.2rem; opacity: 0.9;">
-            Plan your path to financial independence in the Netherlands 🇳🇱<br>
-            Calculate how much capital you need to generate your desired income by your target age, giving you the freedom to work because you want to, not because you have to.
-        </p>
+    <style>
+        .beer-button {
+            background-color: rgba(255, 255, 255, 0.3); 
+            color: white; 
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 5px; 
+            padding: 10px 25px; 
+            font-size: 16px; 
+            font-weight: 600;
+            cursor: pointer; 
+            box-shadow: 0 10px 10px -6px rgba(0, 0, 0, 0.20);
+            transition: background-color 0.3s, transform 0.3s;
+            white-space: nowrap;
+        }
+        .beer-button:hover {
+            background-color: rgba(255, 255, 255, 0.4); 
+            transform: scale(1.05);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            color: white;
+        }
+    </style>
+    <div class="header">
+        <div>
+            <h1 style="color: white; margin: 0;">Dutch Financial Freedom Calculator 🇳🇱</h1>
+            <p style="font-size: 1rem; opacity: 0.8;">
+                • Plan your path to financial independence in the Netherlands <br>
+                • Calculate how much capital you need to generate your desired income by your target age <br>
+                • Give you the freedom to work because you want to, not because you have to.
+            </p>
+        </div>
+        <a href="https://tikkie.me/pay/7flpq8dcju7998a5os46" target="_blank">
+            <button class="beer-button">
+                🍻 Tikkie me a Beer
+            </button>
+        </a>
     </div>
 """, unsafe_allow_html=True)
 
