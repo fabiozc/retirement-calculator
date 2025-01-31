@@ -23,6 +23,7 @@ monthly_aow = 0
 withdrawal_rate = 0
 real_return = 0
 break_even_rate = 0
+years_to_freedom = 0  # Initialize years_to_freedom
 
 # Title section with gradient background and button in the right corner
 st.markdown("""
@@ -132,8 +133,7 @@ left_col, right_col = st.columns([1, 1], gap="large")
 
 # Left column - Inputs
 with left_col:
-    st.markdown("### 🕒 Time to financial freedom")
-    
+
     col1, col2 = st.columns(2)
     with col1:
         initial_age = st.number_input("Current Age", min_value=18, max_value=80, value=INITIAL_AGE,
@@ -146,7 +146,12 @@ with left_col:
         st.error("⚠️ Target age must be greater than your current age")
         st.stop()
     
-    years_to_freedom = target_age - initial_age
+    years_to_freedom = target_age - initial_age  # Calculate years to freedom after inputs
+
+    # Update the title to include years to financial freedom
+    st.info(f"""
+            🕒 Time to financial freedom: **{years_to_freedom} years**
+            """)
     
     st.markdown("---")  # Separator
     st.markdown("### 💶 Income & Investments")
@@ -423,21 +428,28 @@ with right_col:
     # st.markdown("### 📊 Financial Freedom Analysis")
     
     # Main required amount
-    st.markdown(f"### 🎯 Goal: €{monthly_income_goal:,.2f}/month starting at age {target_age}")
-    st.metric(
-        label="Required Investment Portfolio",
-        value=f"€{required_capital:,.2f}",
-        help="Includes Box 3 wealth tax buffer"
-    )
+    st.success(f"""
+        🎯 Goal: €{monthly_income_goal:,.2f}/month starting at age {target_age}
+    """)
     
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric(
+            label="Required Investment Portfolio",
+            value=f"€{required_capital:,.2f}",
+            help="Includes Box 3 wealth tax buffer"
+        )
+    with col2:
+        st.metric(
+            label="Required Monthly Investment",
+            value=f"€{monthly_savings:,.2f}/month",
+            help="Monthly investment needed to reach your freedom goal"
+        )
+
     
     
     # Monthly investment needed
-    st.metric(
-        label="Required Monthly Investment",
-        value=f"€{monthly_savings:,.2f}/month",
-        help="Monthly investment needed to reach your freedom goal"
-    )
+    
     
     # Additional details in expander
     with st.expander("View Details"):
