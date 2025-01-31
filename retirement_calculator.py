@@ -420,17 +420,17 @@ with left_col:
 
 # Right column - Analysis
 with right_col:
-    st.markdown("### 📊 Financial Freedom Analysis")
+    # st.markdown("### 📊 Financial Freedom Analysis")
     
     # Main required amount
-    st.markdown(f"#### Target: €{monthly_income_goal:,.2f}/month from Age {target_age}")
+    st.markdown(f"### 🎯 Goal: €{monthly_income_goal:,.2f}/month starting at age {target_age}")
     st.metric(
         label="Required Investment Portfolio",
         value=f"€{required_capital:,.2f}",
         help="Includes Box 3 wealth tax buffer"
     )
     
-    st.markdown("<br>", unsafe_allow_html=True)  # Add spacing
+    
     
     # Monthly investment needed
     st.metric(
