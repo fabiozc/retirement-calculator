@@ -39,6 +39,7 @@ hide_streamlit_style = """
                 }
                 .stMainBlockContainer {
                 padding-top: 1rem;
+                padding-bottom: 1rem;
                 }
                 </style>
                 """
@@ -66,7 +67,7 @@ years_to_freedom = 0  # Initialize years_to_freedom
 # Title section with gradient background and button in the right corner
 st.markdown("""
     <style>
-        .beer-button {
+        a.beer-button {
             background-color: rgba(255, 255, 255, 0.3); 
             color: white; 
             border: 1px solid rgba(255, 255, 255, 0.5);
@@ -78,6 +79,7 @@ st.markdown("""
             box-shadow: 0 10px 10px -6px rgba(0, 0, 0, 0.20);
             transition: background-color 0.3s, transform 0.3s;
             white-space: nowrap;
+            text-decoration: none;
         }
         .beer-button:hover {
             background-color: rgba(255, 255, 255, 0.4); 
@@ -113,11 +115,7 @@ st.markdown("""
                 • Give you the freedom to work because you want to, not because you have to.
             </p>
         </div>
-        <a href="https://tikkie.me/pay/7flpq8dcju7998a5os46" target="_blank">
-            <button class="beer-button">
-                🍻 Tikkie me a Beer
-            </button>
-        </a>
+        <a class="beer-button" href="https://tikkie.me/pay/7flpq8dcju7998a5os46" target="_blank">🍻 Tikkie me a Beer</a>
     </div>
 """, unsafe_allow_html=True)
 
@@ -559,3 +557,33 @@ st.caption("""
     Investment returns are not guaranteed, and past performance does not indicate future results. The actual results may vary significantly from these projections. 
     By using this calculator, you acknowledge that any decisions you make based on this information are at your own risk.
 """)
+st.markdown("<br>", unsafe_allow_html=True)  # Add some space
+st.markdown("""
+    <style>
+        .footer {
+            background: linear-gradient(90deg, #FF8000 0%, #FF4D00 100%);
+            padding: 2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            border-radius: none;
+        }
+        .footer p{ text-align: center; line-height: 160%; margin: 0;}
+        .footer p strong{ font-size: 1.5rem; }
+        a.beer-link {
+            color: white;
+            display: inline-block;
+            text-decoration: underline;
+        }
+    </style>
+    <div class="footer">
+        <p>
+            I built this tool as a fun way to learn Python and experiment with AI while making something useful. <br>
+            If you found it helpful (or just like seeing people build cool stuff for fun),  
+            <a class="beer-link" href="https://tikkie.me/pay/7flpq8dcju7998a5os46" target="_blank">tikkie me a beer</a>. Cheers 🍻!
+             <br> <br><strong>🚀 🧡 🤓</strong>
+        </p>
+    </div>
+""", unsafe_allow_html=True)
