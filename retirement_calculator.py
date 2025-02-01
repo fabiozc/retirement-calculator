@@ -38,7 +38,7 @@ hide_streamlit_style = """
                 height: 0%;
                 }
                 .stMainBlockContainer {
-                padding-top: 1rem;
+                padding-top: 2rem;
                 padding-bottom: 1rem;
                 }
                 </style>
@@ -80,6 +80,7 @@ st.markdown("""
             transition: background-color 0.3s, transform 0.3s;
             white-space: nowrap;
             text-decoration: none;
+            margin-bottom: 10px;
         }
         .beer-button:hover {
             background-color: rgba(255, 255, 255, 0.4); 
@@ -92,7 +93,7 @@ st.markdown("""
             background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
             padding: 2rem;
             border-radius: 10px;
-            margin-bottom: 2rem;
+            margin-bottom: 3rem;
             color: white;
         }
         @media (max-width: 768px) {
@@ -557,7 +558,7 @@ st.caption("""
     Investment returns are not guaranteed, and past performance does not indicate future results. The actual results may vary significantly from these projections. 
     By using this calculator, you acknowledge that any decisions you make based on this information are at your own risk.
 """)
-st.markdown("<br>", unsafe_allow_html=True)  # Add some space
+st.markdown("<br><br>", unsafe_allow_html=True)  # Add some space
 st.markdown("""
     <style>
         .footer {
