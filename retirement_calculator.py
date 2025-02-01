@@ -197,11 +197,13 @@ with left_col:
     
     monthly_income_goal = st.number_input("Monthly After-Tax Income Goal (€)",
         min_value=0, value=MONTHLY_INCOME_GOAL,
+        step=1000,
         help="How much monthly income you want your investments to generate",
         kwargs={"inputmode": "numeric"})
     
     initial_investment = st.number_input("Current Investment Portfolio (€)",
         min_value=0, value=INITIAL_PORTFOLIO,
+        step=1000,
         help="Your current investment portfolio value",
         kwargs={"inputmode": "numeric"})
     
