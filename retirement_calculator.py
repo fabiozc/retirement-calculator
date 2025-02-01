@@ -49,7 +49,7 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 INITIAL_AGE = 30
 TARGET_AGE = 50
 MONTHLY_INCOME_GOAL = 3000
-INITIAL_PORTFOLIO = 50000
+INITIAL_PORTFOLIO = 0
 ANNUAL_RETURN = 12  # in percentage
 INFLATION_RATE = 3  # in percentage
 
