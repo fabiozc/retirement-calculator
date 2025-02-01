@@ -580,7 +580,7 @@ st.markdown("""
     </style>
     <div class="footer">
         <p>
-            I built this tool as a fun way to learn Python and experiment with AI while making something useful. <br>
+            Hi, my name is Fabio and I built this tool as a fun way to learn Python and experiment with AI while making something useful. <br>
             If you found it helpful (or just like seeing people build cool stuff for fun),  
             <a class="beer-link" href="https://tikkie.me/pay/7flpq8dcju7998a5os46" target="_blank">tikkie me a beer</a>. Cheers 🍻!
              <br> <br><strong>🚀 🧡 🤓</strong>
