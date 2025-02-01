@@ -8,6 +8,42 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+hide_streamlit_style = """
+                <style>
+                div[data-testid="stToolbar"] {
+                visibility: hidden;
+                height: 0%;
+                position: fixed;
+                }
+                div[data-testid="stDecoration"] {
+                visibility: hidden;
+                height: 0%;
+                position: fixed;
+                }
+                div[data-testid="stStatusWidget"] {
+                visibility: hidden;
+                height: 0%;
+                position: fixed;
+                }
+                #MainMenu {
+                visibility: hidden;
+                height: 0%;
+                }
+                header {
+                visibility: hidden;
+                height: 0%;
+                }
+                footer {
+                visibility: hidden;
+                height: 0%;
+                }
+                .stMainBlockContainer {
+                padding-top: 1rem;
+                }
+                </style>
+                """
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
 # Initial values
 INITIAL_AGE = 30
 TARGET_AGE = 50
@@ -24,6 +60,8 @@ withdrawal_rate = 0
 real_return = 0
 break_even_rate = 0
 years_to_freedom = 0  # Initialize years_to_freedom
+
+
 
 # Title section with gradient background and button in the right corner
 st.markdown("""
@@ -82,6 +120,8 @@ st.markdown("""
         </a>
     </div>
 """, unsafe_allow_html=True)
+
+
 
 def calculate_monthly_savings(goal, current, annual_rate, years):
     if annual_rate <= -1:  # Handle extreme negative real returns
@@ -434,17 +474,17 @@ with right_col:
     
     col1, col2 = st.columns(2)
     with col1:
-        st.metric(
-            label="Required Investment Portfolio",
-            value=f"€{required_capital:,.2f}",
-            help="Includes Box 3 wealth tax buffer"
-        )
-    with col2:
         # Monthly investment needed
         st.metric(
             label="Required Monthly Investment",
             value=f"€{monthly_savings:,.2f}/month",
             help="Monthly investment needed to reach your freedom goal"
+        )
+    with col2:
+        st.metric(
+            label="Required Investment Portfolio",
+            value=f"€{required_capital:,.2f}",
+            help="Includes Box 3 wealth tax buffer"
         )
     
     # Additional details in expander
